@@ -1,0 +1,121 @@
+bronyawebsite.html
+// var title = document.queryselector("h1");
+// title.innerHTML = "This is the title from code.js"
+
+var button = document.querySelector("#cv");
+
+button. addEventListener("click", myfunction);
+
+function myfunction(){
+    alert("Let me tell you more about myself!")
+}
+
+var mycode = document.createElement("div");
+// change basic attributes 
+mynode.id = "work1_intro";
+mynode.innerhtml ="The work is an exhibiton";
+mynode.style.color = "blue";
+
+// add event listerner
+mynode.addEventListener("click",welcomeTowrk1 );
+document.queryselector("#my_work1").appendchild(mynode);
+
+function welcomework1() {
+    mycode.innerHTML = "Thank you for your interest in my work!"
+}
+
+<!DOCTYPE html>
+<htm1 lang="en">
+<head>
+    <meta charset="UTF-8>
+    <meta name="content="width=device-width,initial-scale=1.0>"
+    <title> Meiqing personal website</title>
+    <link href="style.css" rel="stylesheet" />
+
+</head>
+<body>
+    <h1>this is a title from htm1 </h1>
+
+    <div id="main">
+        <!--this is a comment -->
+        Hello! This is my new personal website.
+        <button class="subpage">About me</button>
+        <button class="subpage">Gallery</button>
+        <button id="cv" class="subpage">cv</button>
+        <p> My self-introduction is one sentence. </p>
+            <img src="southeast.jpg"/>
+    </div>
+
+    <div class="box">  
+     <div>one</div>  
+     <div>two</div>
+     <div>Three<div>
+     first line<br> 
+     second line</br>
+</div--> 
+
+    <div class="grid-containere">
+       <div class="grid-item1" >my work 1 </div>
+       <div class="grid-item2"> my work 2 </div>
+       <div class="grid-item2"> my work 3 </div>
+</div>
+
+    <script src="code.js"></script>
+
+</body>
+</html>
+
+
+* {
+    color: rgb(2,36,81); /*a comment */
+    margin: 10px;
+    font: 14px Tahoma,sans-serif;
+    background-color: antiquewhite
+}
+
+p{
+    color: black;
+    margin:0; /* Remove all margins to minimize space */
+}
+
+ .subpage {
+    color: black;
+    margin:0; /* Remove margins for button */
+}
+
+.box {
+    display: flex;
+}
+
+.box div {
+    border: solid 1px black;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-rows: 100px 100px;
+    grid-template-columns: 100px 100px 100px;
+    grid-gap: 10px;
+}
+
+.grid-item1 {
+    background: lightgrey;
+    border: solid 1px black;
+    grid-column-start: 1/ 3;
+    grid-row: 1/2;
+}
+
+.grid-item2 {
+    background: lightgrey;
+    border: solid 1px black;
+    grid-column-start: 3/ 4;
+    grid-row: 1/3;
+
+}
+   
+.grid-item3 {
+    background: lightgrey;
+    border: solid 1px black;
+    grid-column-start: 1/ 3;
+    grid-row: 2/3;
+}
