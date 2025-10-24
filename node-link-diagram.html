@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bronya – Node-Link + Adjacency Matrix</title>
-
-    <!-- D3 v7 -->
+    <title>Bronya – 丰富连接的创意网络</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-
     <style>
-        /* ==================== 全局样式 ==================== */
         html { background:#fff; scroll-behavior:smooth; }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: Tahoma, sans-serif;
-            background:#faf0e6;               /* antiquewhite */
+            background:#faf0e6;
             color:#022450;
             line-height:1.6;
             padding:20px;
@@ -23,7 +19,6 @@
         h2 { font-size:1.5rem; text-align:center; margin:1.5rem 0 .8rem; color:#1a936f; }
         p  { max-width:70ch; margin:1rem auto; text-align:center; }
 
-        /* ==================== 图表容器 ==================== */
         .visualization {
             width: 960px;
             max-width: 100%;
@@ -38,9 +33,13 @@
         #node-link-diagram { height: 680px; }
         #adjacency-matrix { height: auto; }
 
-        /* ==================== Node-Link 样式 ==================== */
+        /* Node-Link 样式 */
         .link {
-            stroke:#999; stroke-opacity:.6; stroke-width:2.5px;
+            stroke:#999; stroke-opacity:.7; stroke-width:2.5px;
+            transition: stroke .2s;
+        }
+        .link.branch {
+            stroke:#ff6b6b; stroke-width:3px; stroke-dasharray:5,5;
         }
         .node circle {
             cursor:pointer; transition:all .25s ease;
@@ -57,11 +56,8 @@
         }
         .node.central text { font-size:18px; font-weight:700; fill:#fff; }
 
-        /* ==================== 邻接矩阵样式 ==================== */
-        #matrix-container {
-            overflow-x:auto;
-            margin-top:1rem;
-        }
+        /* 邻接矩阵 */
+        #matrix-container { overflow-x:auto; margin-top:1rem; }
         table {
             width:100%; border-collapse:collapse; margin:0 auto;
             font-size:14px; background:white;
@@ -77,10 +73,9 @@
         th:first-child, td:first-child {
             background:#f0f0f0; font-weight:700; position:sticky; left:0; z-index:9;
         }
-        .cell-1 { background:#d4edda; color:#155724; }
+        .cell-1 { background:#d4edda; color:#155724; font-weight:bold; }
         .cell-0 { background:#f8f9fa; color:#6c757d; }
 
-        /* 响应式 */
         @media (max-width: 768px) {
             .visualization { padding:1rem; }
             #node-link-diagram { height:520px; }
@@ -88,27 +83,24 @@
         }
     </style>
 </head>
-
 <body>
     <header>
-        <h1>Bronya 的创意网络</h1>
+        <h1>Bronya 的创意生态网络</h1>
         <p>
-            以下是 <strong>Node-Link 图</strong> 与其自动生成的 <strong>邻接矩阵（Adjacency Matrix）</strong>。
-            中心节点为 Bronya，连接六个创意领域。
+            不仅展示 Bronya 与 6 个领域的连接，<strong>还包含领域之间的交叉协作</strong>（用虚线表示）。
+            下方自动生成更丰富的 <strong>邻接矩阵</strong>。
         </p>
     </header>
 
-    <!-- ==================== Node-Link 图 ==================== -->
     <section class="visualization" id="node-link-diagram"></section>
 
-    <!-- ==================== 邻接矩阵 ==================== -->
     <section class="visualization" id="adjacency-matrix">
-        <h2>邻接矩阵（Adjacency Matrix）</h2>
+        <h2>邻接矩阵（含交叉连接）</h2>
         <div id="matrix-container"></div>
     </section>
 
     <script>
-        /* ==================== 数据定义 ==================== */
+        /* ==================== 数据（含交叉连接） ==================== */
         const data = {
             nodes: [
                 { id: "Bronya",               group: "central" },
@@ -120,35 +112,43 @@
                 { id: "摄影\nPhotography",  group: "branch" }
             ],
             links: [
-                { source: "Bronya", target: "BA Creative Media\nCityU SCM", value: 1 },
-                { source: "Bronya", target: "插画\nIllustration",          value: 1 },
-                { source: "Bronya", target: "电影\nFilmmaking",            value: 1 },
-                { source: "Bronya", target: "绘画\nPainting",              value: 1 },
-                { source: "Bronya", target: "雕塑\nSculpture",             value: 1 },
-                { source: "Bronya", target: "摄影\nPhotography",           value: 1 }
+                // Bronya → 所有
+                ...["BA Creative Media\nCityU SCM", "插画\nIllustration", "电影\nFilmmaking",
+                    "绘画\nPainting", "雕塑\nSculpture", "摄影\nPhotography"].map(t => ({
+                    source: "Bronya", target: t, type: "main"
+                })),
+                // 交叉连接（用虚线表示）
+                { source: "插画\nIllustration", target: "绘画\nPainting", type: "branch" },
+                { source: "插画\nIllustration", target: "摄影\nPhotography", type: "branch" },
+                { source: "电影\nFilmmaking", target: "摄影\nPhotography", type: "branch" },
+                { source: "电影\nFilmmaking", target: "绘画\nPainting", type: "branch" },
+                { source: "绘画\nPainting", target: "雕塑\nSculpture", type: "branch" },
+                { source: "雕塑\nSculpture", target: "摄影\nPhotography", type: "branch" },
+                { source: "摄影\nPhotography", target: "BA Creative Media\nCityU SCM", type: "branch" },
+                { source: "插画\nIllustration", target: "BA Creative Media\nCityU SCM", type: "branch" }
             ]
         };
 
         const width  = 960;
         const height = 680;
 
-        /* ==================== Node-Link 图 (D3) ==================== */
+        /* ==================== Node-Link 图 ==================== */
         const svg = d3.select("#node-link-diagram")
             .append("svg")
             .attr("viewBox", `0 0 ${width} ${height}`)
             .attr("preserveAspectRatio", "xMidYMid meet");
 
         const simulation = d3.forceSimulation(data.nodes)
-            .force("link", d3.forceLink(data.links).id(d => d.id).distance(190))
-            .force("charge", d3.forceManyBody().strength(-560))
+            .force("link", d3.forceLink(data.links).id(d => d.id).distance(d => d.type === "branch" ? 140 : 190))
+            .force("charge", d3.forceManyBody().strength(-620))
             .force("center", d3.forceCenter(width/2, height/2))
-            .force("collide", d3.forceCollide().radius(d => d.group==="central"? 55:45));
+            .force("collide", d3.forceCollide().radius(d => d.group==="central"? 60:48));
 
         const link = svg.append("g")
             .selectAll("line")
             .data(data.links)
             .join("line")
-            .attr("class", "link");
+            .attr("class", d => "link " + (d.type === "branch" ? "branch" : ""));
 
         const node = svg.append("g")
             .selectAll("g")
@@ -164,9 +164,9 @@
             .attr("dy", d => d.group==="central"? 5:4);
 
         const drag = d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended);
+            .on("start", d => { if (!d3.event.active) simulation.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; })
+            .on("drag",  d => { d.fx = d3.event.x; d.fy = d3.event.y; })
+            .on("end",   d => { if (!d3.event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; });
         node.call(drag);
 
         simulation.on("tick", () => {
@@ -175,11 +175,7 @@
             node.attr("transform", d => `translate(${d.x},${d.y})`);
         });
 
-        function dragstarted(event, d) { if (!event.active) simulation.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; }
-        function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
-        function dragended(event, d) { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
-
-        // 初始环绕布局
+        // 初始布局
         const branchCount = data.nodes.length - 1;
         const angleStep = 2 * Math.PI / branchCount;
         data.nodes.forEach((n, i) => {
@@ -187,9 +183,8 @@
                 n.x = width / 2; n.y = height / 2;
             } else {
                 const angle = (i - 1) * angleStep - Math.PI / 2;
-                const radius = 230;
-                n.x = width / 2 + radius * Math.cos(angle);
-                n.y = height / 2 + radius * Math.sin(angle);
+                n.x = width / 2 + 230 * Math.cos(angle);
+                n.y = height / 2 + 230 * Math.sin(angle);
             }
         });
         simulation.restart();
@@ -207,26 +202,22 @@
         data.links.forEach(link => {
             const i = nodeIds.indexOf(link.source.id || link.source);
             const j = nodeIds.indexOf(link.target.id || link.target);
-            matrix[i][j] = 1;
-            matrix[j][i] = 1; // 无向图
+            if (i !== -1 && j !== -1) {
+                matrix[i][j] = 1;
+                matrix[j][i] = 1; // 无向图
+            }
         });
 
-        // 渲染表格
         const tableHTML = `
             <table>
                 <thead>
-                    <tr>
-                        <th></th>
-                        ${nodeIds.map(id => `<th title="${id}">${id.split('\n')[0]}</th>`).join('')}
-                    </tr>
+                    <tr><th></th>${nodeIds.map(id => `<╎<th title="${id}">${id.split('\n')[0]}</th>`).join('')}</tr>
                 </thead>
                 <tbody>
                     ${matrix.map((row, i) => `
                         <tr>
                             <td>${nodeIds[i].split('\n')[0]}</td>
-                            ${row.map((val, j) => `
-                                <td class="cell-${val}">${val}</td>
-                            `).join('')}
+                            ${row.map(val => `<td class="cell-${val}">${val}</td>`).join('')}
                         </tr>
                     `).join('')}
                 </tbody>
