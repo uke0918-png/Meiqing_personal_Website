@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Around the World – Romantic Grid Cartogram</title>
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #ffeef8, #fad0e6, #d1c4e9);
+            color: #4a148c;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 25px;
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: 24px;
+            margin-bottom: 45px;
+            box-shadow: 0 18px 50px rgba(136, 14, 79, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%23f8bbd0" d="M50 15C30 5 10 25 10 45c0 30 40 50 40 50s40-20 40-50c0-20-20-40-40-30z"/></svg>') repeat;
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+        h1 {
+            font-size: 3.4em;
+            margin: 0 0 15px;
+            background: linear-gradient(90deg, #d81b60, #e91e63, #ad1457, #880e4f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #880e4f;
+            font-weight: 700;
+            margin-bottom: 18px;
+            font-style: italic;
+        }
+
+        .intro {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            font-size: 1.15em;
+            color: #6a1b9a;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cartogram-wrapper {
+            position: relative;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(136, 14, 79, 0.2);
+            margin-bottom: 45px;
+            overflow: hidden;
+            border: 2px solid #f8bbd0;
+        }
+
+        #cartogram-svg {
+            width: 100%;
+            height: 820px;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #fdf2f8, #fce4ec);
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.97);
+            padding: 20px 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(136, 14, 79, 0.18);
+            font-size: 15px;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            border: 1px solid #f8bbd0;
+            max-width: 320px;
+        }
+
+        .legend-title {
+            font-weight: 800;
+            margin-bottom: 14px;
+            color: #880e4f;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .legend-swatch {
+            width: 22px;
+            height: 22px;
+            margin-right: 14px;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(136, 14, 79, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 22px;
+            margin: 45px 0;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 18px;
+            text-align: center;
+            box-shadow: 0 12px 35px rgba(136, 14, 79, 0.15);
+            transition: all 0.4s ease;
+            border: 1px solid #f8bbd0;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(136, 14, 79, 0.25);
+        }
+
+        .stat-value {
+            font-size: 2.8em;
+            font-weight: 900;
+            background: linear-gradient(90deg, #d81b60, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 1.15em;
+            color: #880e4f;
+            margin-top: 8px;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(74, 20, 140, 0.92);
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10000;
+            box-shadow: 0 8px 25px rgba(136, 14, 79, 0.35);
+            max-width: 280px;
+            line-height: 1.6;
+            border: 1px solid #f8bbd0;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border: 8px solid transparent;
+            border-top-color: rgba(74, 20, 140, 0.92);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 1em;
+            color: #6a1b9a;
+            margin-top: 35px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            border: 1px dashed #f8bbd0;
+            font-style: italic;
+        }
+
+        .heart {
+            color: #e91e63;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            #cartogram-svg { height: 600px; }
+            h1 { font-size: 2.5em; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .legend { position: static; margin-top: 25px; }
+            .cartogram-wrapper { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Love Around the World</h1>
+        <p class="subtitle">A Romantic Grid Cartogram of Global Love & Marriage</p>
+        <p class="intro">
+            Each heart represents a country. <strong>Size</strong> = average age at first marriage (older = larger). 
+            <strong>Color</strong> = romantic intensity (higher marriage rate = deeper red). 
+            Where love blooms latest, hearts grow biggest.
+        </p>
+    </header>
+
+    <div class="cartogram-wrapper">
+        <svg id="cartogram-svg"></svg>
+
+        <div class="legend">
+            <div class="legend-title">Romantic Intensity</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#fce4ec;"></div>Low (Divorce-prone)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#f8bbd0;"></div>Moderate</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#f48fb1;"></div>Stable</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#f06292;"></div>Strong</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#e91e63;"></div>Forever Love</div>
+        </div>
+
+        <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-value" id="total-countries">0</div>
+            <div class="stat-label">Lovers' Nations</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" id="oldest-bride">0</div>
+            <div class="stat-label">Oldest Bride (Avg)</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" id="youngest-bride">0</div>
+            <div class="stat-label">Youngest Bride (Avg)</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" id="most-romantic">0</div>
+            <div class="stat-label">Most Romantic</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <p>
+            <span class="heart">Heart</span> 
+            Data: UN World Marriage Data (2023), OECD Family Database. 
+            Hover over hearts to discover where love waits longest and burns brightest. 
+            <em>"Love is not about how many days, months, or years you've been together. Love is about how much you love each other every day."</em>
+            <span class="heart">Heart</span>
+        </p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // === ROMANTIC DATA: Country, Avg Age at First Marriage (Women), Marriage Rate (per 1000), Code ===
+    const loveData = [
+        { country: "Sweden", age: 34.2, rate: 4.8, code: "SE" },
+        { country: "Norway", age: 33.8, rate: 4.5, code: "NO" },
+        { country: "Denmark", age: 33.5, rate: 5.1, code: "DK" },
+        { country: "Germany", age: 32.1, rate: 4.6, code: "DE" },
+        { country: "Canada", age: 31.8, rate: 4.4, code: "CA" },
+        { country: "Australia", age: 31.5, rate: 4.8, code: "AU" },
+        { country: "United States", age: 28.6, rate: 6.1, code: "US" },
+        { country: "France", age: 33.1, rate: 3.9, code: "FR" },
+        { country: "Italy", age: 32.8, rate: 3.2, code: "IT" },
+        { country: "Spain", age: 34.0, rate: 3.5, code: "ES" },
+        { country: "Japan", age: 30.4, rate: 4.8, code: "JP" },
+        { country: "South Korea", age: 31.9, rate: 5.2, code: "KR" },
+        { country: "United Kingdom", age: 32.3, rate: 4.3, code: "GB" },
+        { country: "Netherlands", age: 32.7, rate: 4.1, code: "NL" },
+        { country: "Switzerland", age: 31.6, rate: 5.0, code: "CH" },
+        { country: "New Zealand", age: 31.2, rate: 4.7, code: "NZ" },
+        { country: "India", age: 22.8, rate: 8.9, code: "IN" },
+        { country: "China", age: 26.3, rate: 7.2, code: "CN" },
+        { country: "Brazil", age: 27.1, rate: 6.8, code: "BR" },
+        { country: "Mexico", age: 25.9, rate: 6.5, code: "MX" },
+        { country: "Turkey", age: 25.4, rate: 7.1, code: "TR" },
+        { country: "Russia", age: 25.2, rate: 7.9, code: "RU" },
+        { country: "Egypt", age: 22.1, rate: 9.1, code: "EG" },
+        { country: "Nigeria", age: 23.5, rate: 8.7, code: "NG" },
+        { country: "Indonesia", age: 23.8, rate: 8.3, code: "ID" },
+        { country: "Vietnam", age: 24.6, rate: 7.8, code: "VN" },
+        { country: "Thailand", age: 26.8, rate: 6.9, code: "TH" },
+        { country: "Greece", age: 31.1, rate: 4.9, code: "GR" },
+        { country: "Portugal", age: 32.0, rate: 3.8, code: "PT" },
+        { country: "Israel", age: 26.5, rate: 6.7, code: "IL" },
+        { country: "South Africa", age: 28.2, rate: 5.9, code: "ZA" },
+        { country: "Argentina", age: 29.4, rate: 5.3, code: "AR" },
+        { country: "Chile", age: 30.1, rate: 4.2, code: "CL" },
+        { country: "Poland", age: 29.8, rate: 5.1, code: "PL" },
+        { country: "Ireland", age: 33.9, rate: 4.6, code: "IE" }
+    ];
+
+    // === SVG Setup ===
+    const svg = d3.select("#cartogram-svg");
+    const width = 1240;
+    const height = 820;
+    svg.attr("viewBox", `0 0 ${width} ${height}`);
+
+    const g = svg.append("g").attr("transform", "translate(50,50)");
+
+    // Tooltip
+    const tooltip = d3.select("#tooltip");
+
+    // === Scales ===
+    const maxAge = d3.max(loveData, d => d.age);
+    const minAge = d3.min(loveData, d => d.age);
+    const sizeScale = d3.scaleSqrt()
+        .domain([minAge, maxAge])
+        .range([15, 85]); // heart size
+
+    const colorScale = d3.scaleThreshold()
+        .domain([4, 5.5, 6.5, 7.5])
+        .range(["#fce4ec", "#f8bbd0", "#f48fb1", "#f06292", "#e91e63"]);
+
+    // === Heart Shape Path ===
+    const heartPath = (scale) => {
+        const s = scale || 1;
+        return `M${0*s},${25*s}
+                C${-15*s},${10*s} ${-30*s},${0*s} ${-30*s},${-15*s}
+                C${-30*s},${-30*s} ${0*s},${-45*s} ${0*s},${-25*s}
+                C${0*s},${-45*s} ${30*s},${-30*s} ${30*s},${-15*s}
+                C${30*s},${0*s} ${15*s},${10*s} ${0*s},${25*s}Z`;
+    };
+
+    // === Hexagonal Grid Layout ===
+    const hexRadius = 92;
+    const cols = Math.floor((width - 100) / (hexRadius * 1.5));
+    loveData.forEach((d, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = col * hexRadius * 1.5 + (row % 2) * (hexRadius * 0.75);
+        const y = row * hexRadius * Math.sqrt(3) * 0.9;
+        d.x = x + hexRadius;
+        d.y = y + hexRadius;
+    });
+
+    // === Draw Hearts ===
+    const cells = g.selectAll(".lover")
+        .data(loveData)
+        .enter()
+        .append("g")
+        .attr("class", "lover")
+        .attr("transform", d => `translate(${d.x},${d.y})`);
+
+    cells.append("path")
+        .attr("d", d => heartPath(sizeScale(d.age) / 30))
+        .attr("fill", d => colorScale(d.rate))
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 3)
+        .style("cursor", "pointer")
+        .on("mouseover", function(event, d) {
+            d3.select(this)
+                .transition().duration(180)
+                .attr("stroke", "#ff4081")
+                .attr("stroke-width", 6)
+                .attr("transform", "scale(1.15)");
+
+            tooltip.transition().duration(220).style("opacity", 1);
+            tooltip.html(`
+                <strong style="font-size:1.2em;">${d.country}</strong><br>
+                <span style="color:#ff80ab;">First Marriage Age: ${d.age.toFixed(1)} years</span><br>
+                <span style="color:#ff80ab;">Marriage Rate: ${d.rate}/1000</span><br>
+                <em style="font-size:0.9em;">Rank #${loveData
+                    .sort((a,b)=>b.age-a.age)
+                    .findIndex(x=>x.code===d.code)+1} in waiting for love</em>
+            `)
+            .style("left", (event.pageX + 18) + "px")
+            .style("top", (event.pageY - 40) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select(this)
+                .transition().duration(300)
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 3)
+                .attr("transform", "scale(1)");
+
+            tooltip.transition().duration(350).style("opacity", 0);
+        });
+
+    // Labels for late bloomers
+    cells.filter(d => d.age > 32)
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.35em")
+        .attr("font-size", d => Math.min(18, sizeScale(d.age) * 0.35))
+        .attr("font-weight", "bold")
+        .attr("fill", "#fff")
+        .attr("pointer-events", "none")
+        .text(d => d.code);
+
+    // === Stats ===
+    const total = loveData.length;
+    const oldest = d3.max(loveData, d => d.age).toFixed(1);
+    const youngest = d3.min(loveData, d => d.age).toFixed(1);
+    const mostRomantic = loveData.sort((a,b) => b.rate - a.rate)[0].country;
+
+    document.getElementById('total-countries').textContent = total;
+    document.getElementById('oldest-bride').textContent = oldest;
+    document.getElementById('youngest-bride').textContent = youngest;
+    document.getElementById('most-romantic').textContent = mostRomantic;
+
+    // Responsive
+    window.addEventListener('resize', () => {
+        const newWidth = svg.node().parentNode.clientWidth - 60;
+        svg.attr("width", newWidth);
+    });
+});
+</script>
+
+</body>
+</html>
