@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aloha Art Timeline</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Fredoka One', cursive;
+      margin: 0;
+      background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 40%, #F4A460 100%);
+      color: #2C3E50;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #FF6B6B;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      font-size: 2.8em;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.3em;
+      color: #2E8B57;
+      margin-bottom: 20px;
+    }
+
+    #vis {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 20px;
+      display: inline-block;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: rgba(46, 139, 87, 0.95);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      pointer-events: none;
+      opacity: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border: 2px solid #FFD700;
+      font-weight: bold;
+    }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: #FF6B6B;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1em;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+
+    button:hover:not(:disabled) {
+      background: #FF4757;
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      background: #95A5A6;
+      cursor: not-allowed;
+    }
+
+    /* Surfboard Slider */
+    .slider-container {
+      position: relative;
+      width: 300px;
+    }
+
+    #yearSlider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 30px;
+      background: #FFF;
+      outline: none;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+
+    #yearSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 50px;
+      height: 50px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"><path d="M10 5 Q 5 20, 10 35 L90 35 Q95 20,90 5 Z" fill="%23FF6B6B"/><path d="M20 15 L30 25 L20 35" fill="white"/><path d="M40 15 L50 25 L40 35" fill="white"/><path d="M60 15 L70 25 L60 35" fill="white"/></svg>') center/contain no-repeat;
+      cursor: grab;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    #yearSlider::-moz-range-thumb {
+      width: 50px;
+      height: 50px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"><path d="M10 5 Q 5 20, 10 35 L90 35 Q95 20,90 5 Z" fill="%23FF6B6B"/><path d="M20 15 L30 25 L20 35" fill="white"/><path d="M40 15 L50 25 L40 35" fill="white"/><path d="M60 15 L70 25 L60 35" fill="white"/></svg>') center/contain no-repeat;
+      border: none;
+      cursor: grab;
+    }
+
+    .year-label {
+      font-size: 1.5em;
+      color: #2E8B57;
+      font-weight: bold;
+    }
+
+    .axis-label {
+      fill: #2C3E50;
+      font-size: 14px;
+    }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 80px;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23FFFFFF" fill-opacity="0.6" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,176C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') bottom/contain repeat-x;
+      animation: wave 12s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes wave {
+      0% { background-position-x: 0; }
+      100% { background-position-x: 1440px; }
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #2E8B57;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌺 Aloha Art Timeline</h1>
+  <p class="subtitle">Watch Hawaiian-inspired art bloom year by year</p>
+
+  <div id="vis"></div>
+
+  <div class="controls">
+    <button id="play">Play Animation</button>
+    <button id="pause" disabled>Pause</button>
+    <div class="slider-container">
+      <input type="range" id="yearSlider" min="2020" max="2023" value="2020" step="1"/>
+    </div>
+    <span class="year-label" id="yearLabel">2020</span>
+  </div>
+
+  <div class="wave"></div>
+
+  <div class="footer">
+    Made with aloha using D3.js | Data: Artworks by Type (2020–2023)
+  </div>
+
+<script>
+(() => {
+  // -------------------------------------------------
+  // 1. DATA
+  // -------------------------------------------------
+  const rawData = [
+    {year:2020,type:"Painting",count:3},
+    {year:2020,type:"Sculpture",count:7},
+    {year:2020,type:"Digital Art",count:4},
+    {year:2021,type:"Painting",count:6},
+    {year:2021,type:"Photography",count:5},
+    {year:2021,type:"Digital Art",count:9},
+    {year:2022,type:"Sculpture",count:4},
+    {year:2022,type:"Digital Art",count:6},
+    {year:2023,type:"Painting",count:7},
+    {year:2023,type:"Photography",count:2},
+    {year:2023,type:"Sculpture",count:5}
+  ];
+
+  const nested = d3.rollup(
+    rawData,
+    v => ({count: d3.sum(v, d=>d.count)}),
+    d => d.year,
+    d => d.type
+  );
+
+  const years = Array.from(nested.keys()).sort(d3.ascending);
+  const types = Array.from(new Set(rawData.map(d=>d.type)));
+
+  // Hawaiian color palette per art type
+  const colorMap = {
+    "Painting": "#FF6B6B",     // Hibiscus red
+    "Sculpture": "#4ECDC4",   // Seafoam
+    "Digital Art": "#FFD93D", // Pineapple yellow
+    "Photography": "#95E1D3"  // Mint lei
+  };
+
+  // -------------------------------------------------
+  // 2. SVG & SCALES
+  // -------------------------------------------------
+  const margin = {top:40, right:40, bottom:70, left:130};
+  const width  = 800 - margin.left - margin.right;
+  const height = 600 - margin.top  - margin.bottom;
+
+  const svg = d3.select("#vis")
+    .append("svg")
+    .attr("width",  width  + margin.left + margin.right)
+    .attr("height", height + margin.top  + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scalePoint()
+    .domain(years)
+    .range([0, width])
+    .padding(0.5);
+
+  const y = d3.scaleBand()
+    .domain(types)
+    .range([0, height])
+    .padding(0.5);
+
+  const r = d3.scaleSqrt()
+    .domain([0, d3.max(rawData, d=>d.count)])
+    .range([8, 32]);
+
+  // -------------------------------------------------
+  // 3. AXES
+  // -------------------------------------------------
+  svg.append("g")
+    .attr("class","x axis")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x).tickSizeOuter(0))
+    .selectAll("text")
+    .style("font-size", "14px")
+    .style("fill", "#2E8B57");
+
+  svg.append("g")
+    .attr("class","y axis")
+    .call(d3.axisLeft(y).tickSizeOuter(0))
+    .selectAll("text")
+    .style("font-size", "16px")
+    .style("fill", "#2C3E50");
+
+  // Axis Labels
+  svg.append("text")
+    .attr("class","axis-label")
+    .attr("x", width/2)
+    .attr("y", height + 50)
+    .style("text-anchor","middle")
+    .style("font-size", "18px")
+    .text("Year");
+
+  svg.append("text")
+    .attr("class","axis-label")
+    .attr("transform","rotate(-90)")
+    .attr("y", -90)
+    .attr("x", -height/2)
+    .style("text-anchor","middle")
+    .style("font-size", "18px")
+    .text("Art Type");
+
+  // -------------------------------------------------
+  // 4. TOOLTIP
+  // -------------------------------------------------
+  const tooltip = d3.select("body").append("div")
+    .attr("class","tooltip")
+    .style("opacity",0);
+
+  // -------------------------------------------------
+  // 5. UPDATE FUNCTION (Blooming Flowers)
+  // -------------------------------------------------
+  function update(year) {
+    d3.select("#yearLabel").text(year);
+    d3.select("#yearSlider").property("value", year);
+
+    const yearMap = nested.get(year) ?? new Map();
+
+    const dots = svg.selectAll("circle")
+      .data(types, d => d);
+
+    // EXIT: Shrink and fade
+    dots.exit()
+      .transition().duration(400)
+      .attr("r", 0)
+      .style("opacity", 0)
+      .remove();
+
+    // UPDATE + ENTER: Bloom like hibiscus
+    const enter = dots.enter().append("circle")
+      .attr("cx", x(year))
+      .attr("cy", d => y(d) + y.bandwidth()/2)
+      .attr("r", 0)
+      .style("opacity", 0)
+      .style("fill", d => colorMap[d] || "#ccc")
+      .style("stroke", "#FFF")
+      .style("stroke-width", 3)
+      .on("mouseover", (event, d) => {
+        const entry = yearMap.get(d);
+        if (!entry) return;
+        tooltip.transition().duration(200).style("opacity", 1);
+        tooltip.html(`${d}<br>Year: ${year}<br>Count: ${entry.count}`)
+          .style("left", (event.pageX + 15) + "px")
+          .style("top", (event.pageY - 40) + "px");
+      })
+      .on("mouseout", () => tooltip.transition().duration(400).style("opacity", 0));
+
+    // Merge and animate
+    dots.merge(enter)
+      .transition().duration(1000)
+      .ease(d3.easeElasticOut)
+      .attr("cx", x(year))
+      .attr("cy", d => y(d) + y.bandwidth()/2)
+      .attr("r", d => {
+        const entry = yearMap.get(d);
+        return entry ? r(entry.count) : 0;
+      })
+      .style("opacity", d => yearMap.has(d) ? 0.9 : 0);
+  }
+
+  // -------------------------------------------------
+  // 6. PLAY / PAUSE
+  // -------------------------------------------------
+  let timer = null;
+  const duration = 1500;
+
+  function play() {
+    if (timer) return;
+    timer = d3.interval(() => {
+      const idx = years.indexOf(+d3.select("#yearLabel").text());
+      const next = years[(idx + 1) % years.length];
+      update(next);
+      if (next === years[0]) pause();
+    }, duration);
+    d3.select("#play").attr("disabled", true);
+    d3.select("#pause").attr("disabled", null);
+  }
+
+  function pause() {
+    if (timer) timer.stop();
+    timer = null;
+    d3.select("#play").attr("disabled", null);
+    d3.select("#pause").attr("disabled", true);
+  }
+
+  d3.select("#play").on("click", play);
+  d3.select("#pause").on("click", pause);
+
+  // -------------------------------------------------
+  // 7. SURFBOARD SLIDER
+  // -------------------------------------------------
+  d3.select("#yearSlider").on("input", function() {
+    pause();
+    update(+this.value);
+  });
+
+  // -------------------------------------------------
+  // 8. INITIAL
+  // -------------------------------------------------
+  update(years[0]);
+
+})();
+</script>
+</body>
+</html>
