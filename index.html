@@ -96,46 +96,201 @@
 
     <!-- ==================== HEADER ==================== -->
     <header>
-        <nav>
-            <ul id="main">
-                <li><p>Bronya Deng</p></li>
-                <a><button class="subpage" onclick="scrollToSection('about')">About Me</button></a>
-                <a><button class="subpage" onclick="scrollToSection('gallery')">Gallery</button></a>
-                <a><button id="cv" class="subpage">CV</button></a>
-                <a class="subpage" href="cartoggram.html"> grid</a>
-               
-            </ul>
-        </nav>
+    <nav>
+        <ul id="main">
+            <li><p>Bronya Deng</p></li>
+            <a><button class="subpage" onclick="scrollToSection('about')">About Me</button></a>
+            <a><button class="subpage" onclick="scrollToSection('gallery')">Gallery</button></a>
+            <a><button id="cv" class="subpage">CV</button></a>
+            <a class="subpage" href="cartoggram.html">grid</a>
+        </ul>
+    </nav>
 
-        <div class="flex-container">
-            <img src="hudie.jpeg" alt="Bronya Deng Portrait"/>
-            <div class="text-container">
-                <h2>Welcome to my website!</h2>
-                <h4>I am a Bachelor of Art in Creative Media at the School of Creative Media.</h4>
-                <a class="intro_button" href="https://substack.com/@bronya3/note/c-164637482?r=6fpbe9&utm_medium=ios&utm_source=notes-share-action" target="_blank">
-                    Follow me on Substack
-                </a>
-            </div>
+    <div class="flex-container">
+        <img src="hudie.jpeg" alt="Bronya Deng Portrait"/>
+        
+        <div class="text-container">
+            <!-- 這裡變彩虹大字 -->
+            <h6 style="font-size:3.8em;font-weight:900;margin:0 0 20px;line-height:1.2;
+                       background:linear-gradient(90deg,#e056fd,#feca57,#48dbfb,#1dd1a1);
+                       -webkit-background-clip:text;background-clip:text;
+                       -webkit-text-fill-color:transparent;
+                       text-align:center;">
+                Welcome to my website!
+            </h6>
+
+            <!-- 副標也變彩虹字 -->
+            <h5 style="font-size:1.6em;font-weight:600;margin:0 0 30px;line-height:1.4;
+                       background:linear-gradient(90deg,#a29bfe,#feca57,#48dbfb,#1dd1a1);
+                       -webkit-background-clip:text;background-clip:text;
+                       -webkit-text-fill-color:transparent;
+                       text-align:center;">
+                I am a Bachelor of Art in Creative Media<br>at the School of Creative Media.
+            </h5>
+
+            <a class="intro_button" href="https://substack.com/@bronya3/note/c-164637482?r=6fpbe9&utm_medium=ios&utm_source=notes-share-action" target="_blank">
+                Follow me on Substack
+            </a>
         </div>
-    </header>
+    </div>
+</header>
+
+<!-- 手機自動縮小字體（貼到你原本的 <style> 最下面即可） -->
+<style>
+    @media (max-width:768px) {
+        .text-container h2 {font-size:2.6em !important;}
+        .text-container h4 {font-size:1.25em !important;}
+    }
+</style>
 
     <!-- ==================== ABOUT ==================== -->
-    <section id="about">
-        <h2>About Me</h2>
-        <p>I blend traditional techniques with digital innovation to tell compelling visual stories.</p>
-        <p>I focus on creating a unique artistic design style. My passion for art and culture has always been the driving force behind my pursuit of innovation.
-            As an illustrator, I excel at blending quality with creativity, weaving intricate details and storytelling into my illustrations.
-            My goal is to transform creativity and life into captivating artworks.</p>
-    </section>
+    <!-- ==================== ABOUT ME（彩虹漸層字版）=================== -->
+<section id="about" style="padding:80px 20px;text-align:center;">
+    <h2 style="font-size:3.2em;font-weight:800;margin:0 0 50px;
+               background:linear-gradient(90deg,#e056fd,#feca57,#48dbfb,#1dd1a1);
+               -webkit-background-clip:text;background-clip:text;
+               -webkit-text-fill-color:transparent;">
+        About Me
+    </h2>
 
+    <div style="max-width:900px;margin:0 auto;line-height:2;font-size:1.25em;font-weight:500;">
+        <p style="margin:0 0 24px;
+                  background:linear-gradient(90deg,#ff9ff3,#f8b500,#48dbfb,#1dd1a1);
+                  -webkit-background-clip:text;background-clip:text;
+                  -webkit-text-fill-color:transparent;">
+            I blend traditional techniques with digital innovation to tell compelling visual stories.
+        </p>
+        <p style="margin:0;
+                  background:linear-gradient(90deg,#a29bfe,#feca57,#48dbfb,#1dd1a1);
+                  -webkit-background-clip:text;background-clip:text;
+                  -webkit-text-fill-color:transparent;">
+            I focus on creating a unique artistic design style. My passion for art and culture has always been the driving force behind my pursuit of innovation.<br>
+            As an illustrator, I excel at blending quality with creativity, weaving intricate details and storytelling into my illustrations.<br>
+            My goal is to transform creativity and life into captivating artworks.
+        </p>
+    </div>
+</section>
+
+<!-- 手機優化（可選） -->
+<style>
+    @media (max-width:768px) {
+        #about h2 {font-size:2.5em;}
+        #about div {font-size:1.15em;padding:0 15px;}
+    }
+</style>
+    
     <!-- ==================== GALLERY ==================== -->
-    <section id="gallery">
-        <h2>Gallery</h2>
-        <div class="box">
-            <div>my work 1</div><div>my work 2</div><div>my work 3</div>
-            <div>first line<br>second line</div>
-        </div>
-    </section>
+   <!-- ==================== GALLERY（三張圖點擊都直接看你的 AE 影片）=================== -->
+<section id="gallery" style="padding:80px 20px;background:linear-gradient(135deg,#ff9ff3,#f8b500,#48dbfb);">
+    <h2 style="text-align:center;font-size:3em;font-weight:800;margin-bottom:60px;
+               background:linear-gradient(90deg,#e056fd,#feca57,#48dbfb,#1dd1a1);
+               -webkit-background-clip:text;background-clip:text;
+               -webkit-text-fill-color:transparent;">
+        Typography & Motion Gallery
+    </h2>
+
+    <div style="max-width:1400px;margin:0 auto;
+                display:flex;flex-wrap:wrap;gap:35px;justify-content:center;align-items:flex-start;">
+        
+        <!-- Work 1 -->
+        <a href="https://www.youtube.com/watch?v=FHiUFFrc6JE" target="_blank" class="work-card">
+            <img src="w1.png" alt="Design name">
+            <p>Design name → Watch Reel</p>
+        </a>
+
+        <!-- Work 2 -->
+        <a href="https://www.youtube.com/watch?v=FHiUFFrc6JE" target="_blank" class="work-card">
+            <img src="w2.png" alt="Creativity is a gift">
+            <p>Creativity is a gift → Watch Reel</p>
+        </a>
+
+        <!-- Work 3 -->
+        <a href="https://www.youtube.com/watch?v=FHiUFFrc6JE" target="_blank" class="work-card">
+            <img src="w3.png" alt="K Bold Design">
+            <p>K Bold Design → Watch Reel</p>
+        </a>
+
+    </div>
+</section>
+
+<!-- 樣式（直接貼在你原本的 <style> 最下面） -->
+<style>
+    .work-card {
+        display:block;
+        width:380px;
+        border-radius:24px;
+        overflow:hidden;
+        box-shadow:0 20px 50px rgba(0,0,0,.5);
+        transition:all .4s ease;
+        background:#000;
+        text-decoration:none;
+    }
+    .work-card:hover {
+        transform:translateY(-15px);
+        box-shadow:0 40px 90px rgba(0,0,0,.7);
+    }
+    .work-card img {
+        width:100%;
+        display:block;
+        transition:transform .6s;
+    }
+    .work-card:hover img {
+        transform:scale(1.08);
+    }
+    .work-card p {
+        color:#fff;
+        text-align:center;
+        padding:20px 10px;
+        font-weight:700;
+        font-size:1.2em;
+        margin:0;
+        background:#000;
+    }
+    @media(max-width:768px){
+        .work-card {width:92%;max-width:380px;}
+        #gallery h2{font-size:2.4em;}
+    }
+</style>
+
+<!-- 美化樣式（直接加在你原本的 <style> 裡面最下面） -->
+<style>
+    .work-card {
+        width:380px;
+        border-radius:24px;
+        overflow:hidden;
+        box-shadow:0 20px 50px rgba(0,0,0,.5);
+        transition:all .4s ease;
+        background:#000;
+    }
+    .work-card:hover {
+        transform:translateY(-12px);
+        box-shadow:0 35px 80px rgba(0,0,0,.7);
+    }
+    .work-card img {
+        width:100%;
+        height:auto;
+        display:block;
+        transition:transform .6s;
+    }
+    .work-card:hover img {
+        transform:scale(1.05);
+    }
+    .work-card p {
+        color:#fff;
+        text-align:center;
+        padding:18px 10px;
+        font-weight:700;
+        font-size:1.2em;
+        margin:0;
+        background:#000;
+        letter-spacing:1px;
+    }
+
+    @media(max-width:768px){
+        .work-card {width:90%;max-width:380px;}
+        #gallery h2{font-size:2.4em;}
+    }
+</style>
 
     <!-- ==================== SCATTERPLOT ==================== -->
     <section id="scatterplot">
@@ -280,5 +435,68 @@
         if(window.innerWidth<768) alert("Tip: 雙指縮放地圖查看點密度");
     });
     </script>
+    <!-- ==================== CV 超美燈箱（點 CV 按鈕就彈出）=================== -->
+<div id="cv-modal" style="display:none;position:fixed;inset:0;width:100vw;height:100vh;
+                        background:rgba(0,0,0,0.95);z-index:99999;display:flex;justify-content:center;
+                        align-items:center;padding:20px;box-sizing:border-box;backdrop-filter:blur(15px);">
+    <div style="position:relative;max-width:1000px;width:100%;max-height:95vh;background:#fff;
+                border-radius:32px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,0.8);
+                animation:popIn 0.6s ease-out;">
+        <!-- 關閉按鈕 -->
+        <button onclick="document.getElementById('cv-modal').style.display='none'"
+                style="position:absolute;top:16px;right:20px;z-index:10;width:48px;height:48px;
+                       background:#ff4757;color:white;border:none;border-radius:50%;font-size:2em;
+                       cursor:pointer;box-shadow:0 8px 25px rgba(0,0,0,0.4);">
+            ×
+        </button>
+
+        <!-- 彩虹標題 -->
+        <div style="background:linear-gradient(135deg,#ff9ff3,#f8b500,#48dbfb);padding:35px 20px;text-align:center;">
+            <h1 style="margin:0;font-size:3.4em;font-weight:900;
+                       background:linear-gradient(90deg,#e056fd,#feca57,#48dbfb,#1dd1a1);
+                       -webkit-background-clip:text;background-clip:text;
+                       -webkit-text-fill-color:transparent;">
+                Bronya Deng – Curriculum Vitae
+            </h1>
+            <p style="margin:8px 0 0;color:#fff;font-size:1.4em;opacity:0.95;">
+                Motion Design × Typography × Creative Media
+            </p>
+        </div>
+
+        <!-- 你的 CV 圖片 -->
+        <img src="cv.jpg" alt="Bronya Deng CV" 
+             style="width:100%;height:auto;max-height:68vh;object-fit:contain;display:block;background:#000;">
+        
+        <p style="text-align:center;color:#ccc;margin:20px 0 10px;font-size:1.1em;">
+            ← 滾輪放大／縮小 · 點空白處或按 × 關閉 →
+        </p>
+    </div>
+</div>
+
+<!-- 點 CV 按鈕 → 彈出燈箱 + 取代原本的 alert -->
+<script>
+    document.getElementById('cv').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('cv-modal').style.display = 'flex';
+    });
+
+    // 點空白處關閉
+    document.getElementById('cv-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
+    // 彈出動畫
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes popIn {
+            from {transform:scale(0.5) translateY(100px);opacity:0;}
+            to {transform:scale(1) translateY(0);opacity:1;}
+        }
+    `;
+    document.head.appendChild(style);
+</script>
 </body>
+
 </html>
